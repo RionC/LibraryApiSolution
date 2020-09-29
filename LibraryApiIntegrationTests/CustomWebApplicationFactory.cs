@@ -26,6 +26,6 @@ namespace LibraryApiIntegrationTests
 
     public class FakeSystemTime : ISystemTime
     {
-        public DateTime GetCurrent { get { return new DateTime(1992, 7, 22, 23, 59, 00); } }
+        public DateTime GetCurrent => new DateTime(1992, 7, 22, 23, 59, 00);
     }
 }

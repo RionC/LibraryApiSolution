@@ -17,7 +17,7 @@ namespace LibraryApiIntegrationTests
             _client = factory.CreateClient();
             _client.DefaultRequestHeaders.Add("Accept", "application/json");
         }
-        // de we get a 200 when we doa GET /serverstatus
+        // de we get a 200 when we do a GET /serverstatus
 
         [Fact]
         public async void GetASuccessStatusCode()
