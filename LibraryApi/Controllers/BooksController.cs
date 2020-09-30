@@ -25,6 +25,44 @@ namespace LibraryApi.Controllers
             _mapperConfig = mapperConfig;
         }
 
+        [HttpDelete("/books/{bookId:int}")]
+        public async Task<ActionResult> RemoveBookFromInventory(int bookId)
+        {
+            var book = await _context.BooksInInventory().SingleOrDefaultAsync(b => b.Id == bookId);
+            if(book != null)
+            {
+                book.IsInInventory = false;
+                await _context.SaveChangesAsync();
+            }
+
+            return NoContent();
+        }
+
+        [HttpPost("/books")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult<GetBookDetailsResponse>> AddBook([FromBody] PostBookCreate bookToAdd)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            else
+            {
+                // add it to the db context. (we need to make it a book)
+                var book = _mapper.Map<Book>(bookToAdd);
+                _context.Books.Add(book);
+
+                // save the changes to the database.
+                await _context.SaveChangesAsync();
+
+                var response = _mapper.Map<GetBookDetailsResponse>(book);
+                
+                // returna 201, with location header, with a cogpy of what they'd get from that location
+                return CreatedAtRoute("books#getbyid", new { bookId = response.Id }, response);
+            }
+        }
+
         [HttpGet("/books")]
         [Produces("application/json")]
         public async Task<ActionResult<GetBooksResponse>> GetAllBooks()
@@ -45,7 +83,7 @@ namespace LibraryApi.Controllers
         /// </summary>
         /// <param name="bookId">the id of the book</param>
         /// <returns>Either details about the book or a 404</returns>
-        [HttpGet("/books/{bookId:int}")]
+        [HttpGet("/books/{bookId:int}", Name = "books#getbyid")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
