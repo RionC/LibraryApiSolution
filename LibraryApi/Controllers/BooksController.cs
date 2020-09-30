@@ -26,12 +26,12 @@ namespace LibraryApi.Controllers
         }
 
         [HttpGet("/books")]
+        [Produces("application/json")]
         public async Task<ActionResult<GetBooksResponse>> GetAllBooks()
         {
             var response = new GetBooksResponse();
 
-            var books = await _context.Books
-                .Where(b => b.IsInInventory == true)
+            var books = await _context.BooksInInventory()
                 .ProjectTo<GetBooksResponseItem>(_mapperConfig)
                 .ToListAsync();
 

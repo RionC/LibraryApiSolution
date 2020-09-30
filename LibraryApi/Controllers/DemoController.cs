@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,6 +12,23 @@ namespace LibraryApi.Controllers
 {
     public class DemoController : ControllerBase
     {
+        IConfiguration _config;
+        ILogger _logger;
+
+        public DemoController(IConfiguration config, ILoggerFactory factory)
+        {
+            _config = config;
+            _logger = factory.CreateLogger("DemoController");
+        }
+
+        [HttpGet("/message")]
+        public ActionResult GetMessage()
+        {
+            var msg = _config.GetValue<string>("message");
+            _logger.LogInformation("They just got the message!");
+            return Ok($"The message is {msg}");
+        }
+
         // Route Params
         // GET /employees/19
         [HttpGet("/employees/{employeeId:int}", Name ="employees#get")]
