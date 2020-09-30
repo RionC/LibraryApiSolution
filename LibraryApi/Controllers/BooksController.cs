@@ -25,6 +25,22 @@ namespace LibraryApi.Controllers
             _mapperConfig = mapperConfig;
         }
 
+        [HttpPut("/books/{bookId:int}/title")]
+        public async Task<ActionResult> UpdateTitle([FromRoute] int bookId, [FromBody] string title)
+        {
+            var book = await _context.BooksInInventory().SingleOrDefaultAsync(b => b.Id == bookId);
+            if(book == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                book.Title = title;
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+        }
+
         [HttpDelete("/books/{bookId:int}")]
         public async Task<ActionResult> RemoveBookFromInventory(int bookId)
         {
